@@ -78,9 +78,7 @@ namespace StatsdClientTests
                 .Setup(p => p.SendAsync(stat + ":" + count.ToString() + "|c"))
                 .Returns(Task.FromResult(false))
                 .Verifiable();
-
       _statsd.LogCount(stat, count);
-
       _outputChannel.VerifyAll();
     }
 
@@ -94,7 +92,6 @@ namespace StatsdClientTests
                 .Returns(Task.FromResult(false))
                 .Verifiable();
       _statsd.LogTiming(stat, count);
-
       _outputChannel.VerifyAll();
     }
 
@@ -123,9 +120,7 @@ namespace StatsdClientTests
                 .Setup(p => p.SendAsync("foo." + stat + ":" + count.ToString() + "|c"))
                 .Returns(Task.FromResult(false))
                 .Verifiable();
-
-            statsd.LogCount(stat, count);
-
+      statsd.LogCount(stat, count);
       _outputChannel.VerifyAll();
     }
 
