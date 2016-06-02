@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StatsdClient;
 using Moq;
+using System.Threading.Tasks;
 
 namespace StatsdClientTests
 {
@@ -73,7 +74,10 @@ namespace StatsdClientTests
     {
       var stat = _testData.NextStatName;
       var count = _testData.NextInteger;
-      _outputChannel.Setup(p => p.Send(stat + ":" + count.ToString() + "|c")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync(stat + ":" + count.ToString() + "|c"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
 
       _statsd.LogCount(stat, count);
 
@@ -85,8 +89,10 @@ namespace StatsdClientTests
     {
       var stat = _testData.NextStatName;
       var count = _testData.NextInteger;
-      _outputChannel.Setup(p => p.Send(stat + ":" + count.ToString() + "|ms")).Verifiable();
-
+      _outputChannel
+                .Setup(p => p.SendAsync(stat + ":" + count.ToString() + "|ms"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       _statsd.LogTiming(stat, count);
 
       _outputChannel.VerifyAll();
@@ -97,7 +103,10 @@ namespace StatsdClientTests
     {
       var stat = _testData.NextStatName;
       var count = _testData.NextInteger;
-      _outputChannel.Setup(p => p.Send(stat + ":" + count.ToString() + "|g")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync(stat + ":" + count.ToString() + "|g"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
 
       _statsd.LogGauge(stat, count);
 
@@ -110,9 +119,12 @@ namespace StatsdClientTests
       var statsd = new Statsd("localhost", 12000, "foo.", outputChannel : _outputChannel.Object);
       var stat = _testData.NextStatName;
       var count = _testData.NextInteger;
-      _outputChannel.Setup(p => p.Send("foo." + stat + ":" + count.ToString() + "|c")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync("foo." + stat + ":" + count.ToString() + "|c"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
 
-      statsd.LogCount(stat, count);
+            statsd.LogCount(stat, count);
 
       _outputChannel.VerifyAll();
     }
@@ -122,8 +134,10 @@ namespace StatsdClientTests
     {
       var statsd = new Statsd("localhost", 12000, prefix : null, outputChannel : _outputChannel.Object);
       var inputStat = "some.stat:1|c";
-      _outputChannel.Setup(p => p.Send(It.Is<string>(q => q == inputStat)))
-        .Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync(It.Is<string>(q => q == inputStat)))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       statsd.LogCount("some.stat");
       _outputChannel.VerifyAll();
     }
@@ -133,8 +147,10 @@ namespace StatsdClientTests
     {
       var statsd = new Statsd("localhost", 12000, prefix : "", outputChannel : _outputChannel.Object);
       var inputStat = "some.stat:1|c";
-      _outputChannel.Setup(p => p.Send(It.Is<string>(q => q == inputStat)))
-        .Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync(It.Is<string>(q => q == inputStat)))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       statsd.LogCount("some.stat");
       _outputChannel.VerifyAll();
     }
@@ -144,8 +160,9 @@ namespace StatsdClientTests
     {
       var statsd = new Statsd("localhost", 12000, prefix : "", outputChannel : _outputChannel.Object);
       var inputStat = "my.raw.stat:12934|r";
-      _outputChannel.Setup(p => p.Send(It.Is<String>(q => q == inputStat)))
-        .Verifiable();
+      _outputChannel.Setup(p => p.SendAsync(It.Is<String>(q => q == inputStat)))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       statsd.LogRaw("my.raw.stat", 12934);
       _outputChannel.VerifyAll();
     }
@@ -156,8 +173,9 @@ namespace StatsdClientTests
       var statsd = new Statsd("localhost", 12000, prefix : "", outputChannel : _outputChannel.Object);
       var almostAnEpoch = DateTime.Now.Ticks;
       var inputStat = "my.raw.stat:12934|r|" + almostAnEpoch;
-      _outputChannel.Setup(p => p.Send(It.Is<String>(q => q == inputStat)))
-        .Verifiable();
+      _outputChannel.Setup(p => p.SendAsync(It.Is<String>(q => q == inputStat)))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       statsd.LogRaw("my.raw.stat", 12934, almostAnEpoch);
       _outputChannel.VerifyAll();
     }

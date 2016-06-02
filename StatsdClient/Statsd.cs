@@ -131,6 +131,26 @@ namespace StatsdClient
         }
 
         /// <summary>
+        ///     Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public async Task LogGaugeAsync(string name, double value)
+        {
+            await SendMetricAsync(MetricType.GAUGE, name, _prefix, value);
+        }
+
+        /// <summary>
+        ///     Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public async Task LogGaugeAsync(string name, decimal value)
+        {
+            await SendMetricAsync(MetricType.GAUGE, name, _prefix, value);
+        }
+
+        /// <summary>
         ///     Log to a set
         /// </summary>
         /// <param name="name">The metric name.</param>
@@ -178,6 +198,25 @@ namespace StatsdClient
         }
 
         private async Task SendMetricAsync(string metricType, string name, string prefix, long value, string postFix = null)
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            await SendMetricAsync(metricType, name, prefix, value.ToString(), postFix);
+        }
+
+        private async Task SendMetricAsync(string metricType, string name, string prefix, double value, string postFix = null)
+        {
+            if (value < 0)
+            {
+                Trace.TraceWarning("Metric value for {0} was less than zero: {1}. Not sending.", name, value);
+                return;
+            }
+            await SendMetricAsync(metricType, name, prefix, value.ToString(), postFix);
+        }
+
+        private async Task SendMetricAsync(string metricType, string name, string prefix, decimal value, string postFix = null)
         {
             if (value < 0)
             {
