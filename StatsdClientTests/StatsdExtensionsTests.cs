@@ -27,7 +27,10 @@ namespace StatsdClientTests
     [TestMethod]
     public void count_SendToStatsd_Success()
     {
-      _outputChannel.Setup(p => p.Send("foo.bar:1|c")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync("foo.bar:1|c"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       _statsd.count().foo.bar += 1;
       _outputChannel.VerifyAll();
     }
@@ -35,15 +38,54 @@ namespace StatsdClientTests
     [TestMethod]
     public void gauge_SendToStatsd_Success()
     {
-      _outputChannel.Setup(p => p.Send("foo.bar:1|g")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync("foo.bar:1|g"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       _statsd.gauge().foo.bar += 1;
       _outputChannel.VerifyAll();
     }
 
     [TestMethod]
+    public void gauge_SendFloatToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 1.5f;
+        _outputChannel.VerifyAll();
+    }
+
+    [TestMethod]
+    public void gauge_SendDoubleToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:2.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 2.5d;
+        _outputChannel.VerifyAll();
+    }
+
+    [TestMethod]
+    public void gauge_SendDecimalToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:2.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 2.5M;
+        _outputChannel.VerifyAll();
+    }
+
+        [TestMethod]
     public void timing_SendToStatsd_Success()
     {
-      _outputChannel.Setup(p => p.Send("foo.bar:1|ms")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync("foo.bar:1|ms"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       _statsd.timing().foo.bar += 1;
       _outputChannel.VerifyAll();
     }
@@ -51,7 +93,10 @@ namespace StatsdClientTests
     [TestMethod]
     public void count_AddNamePartAsString_Success()
     {
-      _outputChannel.Setup(p => p.Send("foo.bar:1|ms")).Verifiable();
+      _outputChannel
+                .Setup(p => p.SendAsync("foo.bar:1|ms"))
+                .Returns(Task.FromResult(false))
+                .Verifiable();
       _statsd.timing().foo._("bar")._ += 1;
       _outputChannel.VerifyAll();
     }

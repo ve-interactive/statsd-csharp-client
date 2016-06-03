@@ -14,7 +14,14 @@ namespace StatsdClient
         /// <param name="count">The counter value (defaults to 1).</param>
         public static void LogCount(this IStatsd client, string name, int count = 1)
         {
-            client.LogCountAsync(name, count).Wait();
+            try
+            {
+                client.LogCountAsync(name, count).Wait();
+            }
+            catch(AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
@@ -24,7 +31,14 @@ namespace StatsdClient
         /// <param name="milliseconds">The duration, in milliseconds, for this metric.</param>
         public static void LogTiming(this IStatsd client, string name, long milliseconds)
         {
-            client.LogTimingAsync(name, milliseconds).Wait();
+            try
+            {
+                client.LogTimingAsync(name, milliseconds).Wait();
+            }
+            catch(AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
@@ -34,7 +48,48 @@ namespace StatsdClient
         /// <param name="value">The value for this gauge</param>
         public static void LogGauge(this IStatsd client, string name, int value)
         {
-            client.LogGaugeAsync(name, value).Wait();
+            try
+            {
+                client.LogGaugeAsync(name, value).Wait();
+            }
+            catch(AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
+        }
+
+        /// <summary>
+        /// Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public static void LogGauge(this IStatsd client, string name, double value)
+        {
+            try
+            {
+                client.LogGaugeAsync(name, value).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
+        }
+
+        /// <summary>
+        /// Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public static void LogGauge(this IStatsd client, string name, decimal value)
+        {
+            try
+            {
+                client.LogGaugeAsync(name, value).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
