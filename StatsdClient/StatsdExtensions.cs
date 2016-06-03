@@ -139,6 +139,12 @@ namespace StatsdClient
         {
           var argType = arg.GetType();
           var name = String.Join(".", _parts);
+
+          if (!_handlerMap.ContainsKey(argType))
+          {
+            throw new ApplicationException("Handler not supported for type: " + argType);
+          }
+
           var handler = _handlerMap[argType];
           handler(_statsd, _metricType, name, arg);
           

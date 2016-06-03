@@ -61,10 +61,10 @@ namespace StatsdClientTests
     public void gauge_SendDoubleToStatsd_Success()
     {
         _outputChannel
-                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Setup(p => p.SendAsync("foo.bar:2.5|g"))
                     .Returns(Task.FromResult(false))
                     .Verifiable();
-        _statsd.gauge().foo.bar += 1.5d;
+        _statsd.gauge().foo.bar += 2.5d;
         _outputChannel.VerifyAll();
     }
 
@@ -72,10 +72,10 @@ namespace StatsdClientTests
     public void gauge_SendDecimalToStatsd_Success()
     {
         _outputChannel
-                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Setup(p => p.SendAsync("foo.bar:2.5|g"))
                     .Returns(Task.FromResult(false))
                     .Verifiable();
-        _statsd.gauge().foo.bar += 1.5M;
+        _statsd.gauge().foo.bar += 2.5M;
         _outputChannel.VerifyAll();
     }
 
