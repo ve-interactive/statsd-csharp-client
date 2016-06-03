@@ -59,6 +59,40 @@ namespace StatsdClient
         }
 
         /// <summary>
+        /// Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public static void LogGauge(this IStatsd client, string name, double value)
+        {
+            try
+            {
+                client.LogGaugeAsync(name, value).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
+        }
+
+        /// <summary>
+        /// Log a gauge.
+        /// </summary>
+        /// <param name="name">The metric name</param>
+        /// <param name="value">The value for this gauge</param>
+        public static void LogGauge(this IStatsd client, string name, decimal value)
+        {
+            try
+            {
+                client.LogGaugeAsync(name, value).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
+        }
+
+        /// <summary>
         /// Log to a set
         /// </summary>
         /// <param name="name">The metric name.</param>

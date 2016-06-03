@@ -49,6 +49,55 @@ namespace StatsdClient
       private IStatsd _statsd;
       private List<string> _parts;
       private string _metricType;
+      private static Dictionary<Type, BinaryOperationHandler> _handlerMap = 
+                new Dictionary<Type, BinaryOperationHandler>();
+
+      private delegate void BinaryOperationHandler(IStatsd client, string metricType, string name, object arg);
+
+      static StatsBuilderInternal()
+      {
+        _handlerMap.Add(typeof(int), IntHandler);
+        _handlerMap.Add(typeof(decimal), DoubleHandler);
+        _handlerMap.Add(typeof(double), DoubleHandler);
+        _handlerMap.Add(typeof(float), DoubleHandler);
+      }
+
+      private static void IntHandler(IStatsd client, string metricType, string name, object arg)
+      {
+          var value = Convert.ToInt32(arg);
+          switch (metricType)
+          {
+            case MetricType.COUNT:
+              client.LogCount(name, value);
+              break;
+            case MetricType.GAUGE:
+              client.LogGauge(name, value);
+              break;
+            case MetricType.TIMING:
+              client.LogTiming(name, value);
+              break;
+            case MetricType.SET:
+              client.LogSet(name, value);
+              break;
+          }
+      }
+
+      private static void DoubleHandler(IStatsd client, string metricType, string name, object arg)
+      {
+          var value = Convert.ToDouble(arg);
+          switch (metricType)
+          {
+            case MetricType.COUNT:
+              throw new NotSupportedException();
+            case MetricType.GAUGE:
+              client.LogGauge(name, value);
+              break;
+            case MetricType.TIMING:
+              throw new NotSupportedException();
+            case MetricType.SET:
+              throw new NotSupportedException();
+          }
+      }
 
       public StatsBuilderInternal(IStatsd statsd, string metricType)
       {
@@ -83,28 +132,16 @@ namespace StatsdClient
         result = null;
         return false;
       }
-
+      
       public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
       {
         if (binder.Operation == ExpressionType.AddAssign)
         {
-          var quantity = (int)arg;
+          var argType = arg.GetType();
           var name = String.Join(".", _parts);
-          switch (_metricType)
-          {
-            case MetricType.COUNT:
-              _statsd.LogCount(name, quantity);
-              break;
-            case MetricType.GAUGE:
-              _statsd.LogGauge(name, quantity);
-              break;
-            case MetricType.TIMING:
-              _statsd.LogTiming(name, quantity);
-              break;
-            case MetricType.SET:
-              _statsd.LogSet(name, quantity);
-              break;
-          }
+          var handler = _handlerMap[argType];
+          handler(_statsd, _metricType, name, arg);
+          
           result = null;
           return true;
         }

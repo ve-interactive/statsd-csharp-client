@@ -47,6 +47,39 @@ namespace StatsdClientTests
     }
 
     [TestMethod]
+    public void gauge_SendFloatToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 1.5f;
+        _outputChannel.VerifyAll();
+    }
+
+    [TestMethod]
+    public void gauge_SendDoubleToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 1.5d;
+        _outputChannel.VerifyAll();
+    }
+
+    [TestMethod]
+    public void gauge_SendDecimalToStatsd_Success()
+    {
+        _outputChannel
+                    .Setup(p => p.SendAsync("foo.bar:1.5|g"))
+                    .Returns(Task.FromResult(false))
+                    .Verifiable();
+        _statsd.gauge().foo.bar += 1.5M;
+        _outputChannel.VerifyAll();
+    }
+
+        [TestMethod]
     public void timing_SendToStatsd_Success()
     {
       _outputChannel
